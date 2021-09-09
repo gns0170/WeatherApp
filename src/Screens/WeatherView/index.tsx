@@ -24,13 +24,14 @@ const LoadingLabel = Styled.Text`
 `;
 
 const WeatherItemContainer = Styled.View`
-    height; 100%;
+    height: 100%;
     justify-content: center;
     align-items: center;
 `;
 const Weather = Styled.Text`
     margin-bottom: 16px;
     font-size: 24px;
+    font-weight: bold;
 `;
 const Temperature = Styled.Text`
     font-size: 16px
@@ -51,18 +52,19 @@ const WeatherView = ({ }: Props) => {
         weather: undefined,
         isLoading: false,
     });
-
     const getCurrentWeather = () =>{
         setWeatherInfo({
             isLoading: false,
         });
         Geolocation.getCurrentPosition(
+            
             position =>{
                 const { latitude, longitude } = position.coords;
+
                 fetch(
-                    `http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=&{longitude}&APPID=${API_KEY}&units=metric`
+                    `http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&APPID=${API_KEY}&units=metric`
                 )
-                .then(response => response.json)
+                .then(response => response.json())
                 .then(json=>{
                     setWeatherInfo({
                         temperature: json.main.temp,
@@ -81,7 +83,7 @@ const WeatherView = ({ }: Props) => {
                 setWeatherInfo({
                     isLoading: true,
                 })
-                showError('위치 정보를 가져오는 데 실패하였다.');
+                showError(`위치 정보를 가져오는 데 실패하였다.`);
             }
         );
     };
@@ -104,31 +106,31 @@ const WeatherView = ({ }: Props) => {
     }
 
     return (
-    <Container>
-        <WeatherContainer
-            onRefresh={() => getCurrentWeather()}
-            refreshing={!isLoading}
-            data={data}
-            keyExtractor={(item, index) => {
-                return 'Weather-${index}';
-            }}
-            ListEmptyComponent={
-                <LoadingView>
-                    <Loading size="large" color="#1976D2" />
-                    <LoadingLabel>Loading...</LoadingLabel>
-                </LoadingView>
-            }
-            renderItem={({ item, index }) => {
-                <WeatherItemContainer>
-                    <Weather>{(item as IWeather).weather}</Weather>
-                    <Temperature>({(item as IWeather).temperature}°C)</Temperature>
-                </WeatherItemContainer>
-            }}
-            contentContainerStyle={{ flex: 1 }}
-        />
-    </Container>
+        <Container>
+            <WeatherContainer
+                onRefresh={() => getCurrentWeather()}
+                refreshing={!isLoading}
+                data={data}
+                keyExtractor={(item, index) => {
+                    return `Weather-${index}`;
+                }}
+                ListEmptyComponent={
+                    <LoadingView>
+                        <Loading size="large" color="#1976D2" />
+                        <LoadingLabel>Loading...</LoadingLabel>
+                    </LoadingView>
+                }
+                renderItem={({ item, index }) => (
+                    <WeatherItemContainer>
+                        <Weather>{(item as IWeather).weather}</Weather>
+                        <Temperature>({(item as IWeather).temperature}°C)</Temperature>
+                    </WeatherItemContainer>
+                )}
+                contentContainerStyle={{ flex: 1 }}
+            />
+        </Container>
     );
 };
-
+export default WeatherView;
 
 
